@@ -49,11 +49,9 @@ std::string HexInspector::get_color_for_byte(unsigned char byte) const {
 }
 
 void HexInspector::print_hex_line(size_t offset, size_t length, size_t highlight_index) const {
-    // Print offset
     std::cout << HexConstants::BLUE << std::setw(8) << std::setfill('0') 
               << std::hex << offset << HexConstants::RESET << "  ";
 
-    // Print hex values
     std::string ascii_display;
     for (size_t i = 0; i < BYTES_PER_LINE; ++i) {
         if (i < length) {
@@ -162,13 +160,11 @@ void HexInspector::display_hex_dump() {
     while (true) {
         clear_screen();
         
-        // Display header
         std::cout << HexConstants::CYAN << HexConstants::BOLD 
                  << "Hex Dump - Page " << (current_page + 1) << " of " << total_pages 
                  << HexConstants::RESET << std::endl;
         std::cout << HexConstants::HORIZONTAL_LINE << std::endl;
 
-        // Display hex dump
         size_t start_offset = current_page * BYTES_PER_LINE * LINES_PER_PAGE;
         for (size_t i = 0; i < LINES_PER_PAGE; ++i) {
             size_t offset = start_offset + (i * BYTES_PER_LINE);
@@ -178,8 +174,7 @@ void HexInspector::display_hex_dump() {
         }
 
         print_footer();
-
-        // Handle input
+        
         char cmd;
         std::cin >> cmd;
         cmd = std::toupper(cmd);

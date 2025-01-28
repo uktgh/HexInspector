@@ -31,9 +31,9 @@ namespace HexConstants {
     const size_t MAX_FILE_SIZE_WARNING = 100 * 1024 * 1024; // 100MB
 
     const std::string HORIZONTAL_LINE = std::string(72, '-');
-    const std::string OFFSET_HEADER = "Offset";
-    const std::string HEX_HEADER = "Hexadecimal Data";
-    const std::string ASCII_HEADER = "ASCII";
+    const std::string OFFSET_HEADER = "offset";
+    const std::string HEX_HEADER = "hexadecimal data";
+    const std::string ASCII_HEADER = "ascii";
     
     const char CMD_NEXT = 'N';
     const char CMD_PREV = 'P';
@@ -48,7 +48,6 @@ namespace HexConstants {
     const char CMD_BOOKMARK = 'B';
     const char CMD_GOTO = 'G';
     
-    // Error Messages
     const std::string ERROR_FILE_NOT_FOUND = "Error: File not found";
     const std::string ERROR_FILE_TOO_LARGE = "Warning: File is larger than " + 
                                             std::to_string(MAX_FILE_SIZE_WARNING/1024/1024) + 
@@ -56,7 +55,6 @@ namespace HexConstants {
     const std::string ERROR_INVALID_COMMAND = "Error: Invalid command";
     const std::string ERROR_INVALID_PAGE = "Error: Invalid page number";
     
-    // Help Messages
     const std::string USAGE_MESSAGE = "Usage: hex_inspector <filename>";
     const std::string HELP_MESSAGE = 
         "Commands:\n"

@@ -1,4 +1,3 @@
-// src/main.cpp
 #include <iostream>
 #include "hex_inspector.h"
 #include "constants.h"

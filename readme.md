@@ -40,16 +40,16 @@ make
 hex_inspector <filename>
 ```
 ### commands
-n -> next page
-p -> previous page
-s -> select page
-f -> find pattern
-h -> toggle highlight
-x -> export hex
-t -> show strings
-m -> show metadata
-b -> set bookmark
-g -> goto offset
-? -> show this help
-e -> exit
+- n -> next page
+- p -> previous page
+- s -> select page
+- f -> find pattern
+- h -> toggle highlight
+- x -> export hex
+- t -> show strings
+- m -> show metadata
+- b -> set bookmark
+- g -> goto offset
+- ? -> show this help
+- e -> exit
 
