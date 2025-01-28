@@ -1,22 +1,25 @@
+// src/main.cpp
 #include <iostream>
-#include <ncurses.h>
-#include <cstdint>
+#include "hex_inspector.h"
+#include "constants.h"
 
-#include "../inc/utils.h"
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cout << HexConstants::BOLD + HexConstants::RED 
+                  << HexConstants::USAGE_MESSAGE 
+                  << HexConstants::RESET << std::endl;
+        return 1;
+    }
 
-void handle_user_input(uint8_t* exe_data, size_t exe_size) {
-    std::string path;
-    std::cout << "Enter the path to the EXE: ";
-    std::cin >> path;
+    try {
+        HexInspector inspector(argv[1]);
+        inspector.display_hex_dump();
+    }
+    catch (const std::exception& e) {
+        std::cout << HexConstants::RED << "Error: " << e.what() 
+                  << HexConstants::RESET << std::endl;
+        return 1;
+    }
 
-    exe_data = load_exe(path, exe_data, exe_size);
-
-    hex_dump(exe_data, exe_size, 0);
-
-    std::string pattern;
-    std::cout << "Enter the pattern to search: ";
-    std::cin >> pattern;
-    search_pattern(exe_data, exe_size, pattern);
-
-    print_file_metadata(path);
+    return 0;
 }

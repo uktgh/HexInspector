@@ -1,16 +1,32 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -lncurses -pthread
-OBJ = src/menu.o src/utils.o
-EXEC = hexinspector
 
-$(EXEC): $(OBJ)
-	$(CXX) $(OBJ) -o $(EXEC)
+CXXFLAGS = -Wall \
+		   -Wextra \
+		   -std=c++17 \
+		   -fPIC \
+		   -no-pie \
+		   -I src/inc
 
-src/menu.o: src/menu.cpp inc/utils.h
-	$(CXX) $(CXXFLAGS) -c src/menu.cpp -o src/menu.o
+SRCDIR = src
+OBJDIR = obj
+BINDIR = bin
 
-src/utils.o: src/utils.cpp inc/utils.h
-	$(CXX) $(CXXFLAGS) -c src/utils.cpp -o src/utils.o
+SOURCES = $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS = $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+TARGET = $(BINDIR)/hex_inspector
 
+$(TARGET): $(OBJECTS)
+	@mkdir -p $(BINDIR)
+	$(CXX) $(OBJECTS) -o $(TARGET)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@mkdir -p $(OBJDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+.PHONY: run
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: clean
 clean:
-	rm -f $(OBJ) $(EXEC)
+	rm -rf $(OBJDIR) $(BINDIR)
