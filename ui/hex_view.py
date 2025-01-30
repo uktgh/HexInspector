@@ -51,5 +51,4 @@ class HexView(ttk.Frame):
                     break
                 end_pos = f"{start_pos}+{len(term)}c"
                 self.text.tag_add('search', start_pos, end_pos)
-                start_pos = end_pos
             self.text.tag_config('search', background='yellow', foreground='black')

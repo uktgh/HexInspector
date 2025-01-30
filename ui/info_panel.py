@@ -7,9 +7,11 @@ class InfoPanel(ttk.Frame):
         self.setup_ui()
 
     def setup_ui(self):
-        self.text = tk.Text(self, font=("Courier", 12), wrap=tk.WORD)
-        self.vsb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
-        self.text.configure(yscrollcommand=self.vsb.set)
-        
-        self.text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.vsb.pack(side=tk.RIGHT, fill=tk.Y)
+        self.text = tk.Text(self, wrap=tk.WORD, state=tk.DISABLED)
+        self.text.pack(fill=tk.BOTH, expand=True)
+
+    def update_info(self, info):
+        self.text.config(state=tk.NORMAL)
+        self.text.delete(1.0, tk.END)
+        self.text.insert(tk.END, info)
+        self.text.config(state=tk.DISABLED)
