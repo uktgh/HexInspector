@@ -305,7 +305,7 @@ class MainWindow:
         file1_path = self.file1_var.get()
         file2_path = self.file2_var.get()
         if file1_path and file2_path:
-            with open(file1_path, 'rb') as f1, open file2_path, 'rb') as f2:
+            with open(file1_path, 'rb') as f1, open(file2_path, 'rb') as f2:
                 data1 = f1.read()
                 data2 = f2.read()
                 differences = self.find_differences(data1, data2)
