@@ -11,7 +11,7 @@ class HexView(ttk.Frame):
         self.setup_ui()
 
     def setup_ui(self):
-        self.text = tk.Text(self, font=("Courier", 12), wrap=tk.NONE)
+        self.text = tk.Text(self, font=("Courier", 12), wrap=tk.NONE, state=tk.DISABLED)
         self.vsb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.hsb = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.text.xview)
         self.text.configure(yscrollcommand=self.vsb.set, xscrollcommand=self.hsb.set)
@@ -24,6 +24,7 @@ class HexView(ttk.Frame):
         self.grid_columnconfigure(0, weight=1)
 
     def update_view(self):
+        self.text.config(state=tk.NORMAL)
         self.text.delete(1.0, tk.END)
         bytes_per_row = 16
         hex_data = self.buffer[:].hex()
@@ -32,6 +33,7 @@ class HexView(ttk.Frame):
             hex_chunk = ' '.join(hex_data[j:j+2] for j in range(i, i + bytes_per_row * 2, 2))
             ascii_chunk = ''.join(c if 32 <= ord(c) < 127 else '.' for c in ascii_data[i//2:i//2 + bytes_per_row])
             self.text.insert(tk.END, f"{i//2:08X}  {hex_chunk:<{bytes_per_row*3}}  {ascii_chunk}\n")
+        self.text.config(state=tk.DISABLED)
 
     def goto_offset(self, offset):
         line = offset // 16 + 1
