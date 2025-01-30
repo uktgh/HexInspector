@@ -7,7 +7,6 @@ def main():
     # root.iconbitmap("assets/icon.ico")
     root.after(0, HexInspectorGUI, root)  # Lazy initialization of the GUI
     root.mainloop()
-    root.destroy()  # Ensure resources are released properly
 
 if __name__ == "__main__":
     main()

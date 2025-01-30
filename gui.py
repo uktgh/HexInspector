@@ -96,13 +96,13 @@ class HexInspectorGUI:
         return re.sub(r'\x1b\[[0-9;]*m', '', text)
 
     def show_metadata(self):
-        if self.filepath:
-            metadata = get_file_metadata(self.filepath)
+        if self.filepaths:
+            metadata = get_file_metadata(self.filepaths[0])
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Metadata:\\\n{metadata}")
+            self.text_area.insert(tk.END, f"Metadata:\\\\n{metadata}")
 
     def calculate_checksum(self):
-        if self.filepath:
+        if self.filepaths:
             checksum_type = simpledialog.askstring("Checksum", "Scegli il tipo (MD5, SHA1, SHA256):")
             checksum = self.hex_viewer.calculate_checksum(checksum_type)
             self.text_area.delete(1.0, tk.END)
@@ -136,29 +136,29 @@ class HexInspectorGUI:
         if self.hex_viewer:
             ascii_strings = self.hex_viewer.find_ascii_strings()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Stringhe ASCII trovate:\\\n{ascii_strings}")
+            self.text_area.insert(tk.END, f"Stringhe ASCII trovate:\\\\n{ascii_strings}")
 
     def find_headers(self):
         if self.hex_viewer:
             headers = self.hex_viewer.find_headers()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Header trovati:\\\n{headers}")
+            self.text_area.insert(tk.END, f"Header trovati:\\\\n{headers}")
 
     def search_hex_pattern(self):
         pattern = simpledialog.askstring("Pattern", "Inserisci il pattern esadecimale da cercare (es. 68 65 6C 6C 6F):")
         if self.hex_viewer:
             results = self.hex_viewer.search_pattern(pattern)
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Pattern trovato:\\\n{results}")
+            self.text_area.insert(tk.END, f"Pattern trovato:\\\\n{results}")
 
     def check_integrity(self):
         if self.hex_viewer:
             integrity = self.hex_viewer.check_integrity()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Integrità del file:\\\n{integrity}")
+            self.text_area.insert(tk.END, f"Integrità del file:\\\\n{integrity}")
 
     def analyze_compression(self):
         if self.hex_viewer:
             compression_info = self.hex_viewer.analyze_compression()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Analisi della compressione:\\\n{compression_info}")
+            self.text_area.insert(tk.END, f"Analisi della compressione:\\\\n{compression_info}")

@@ -24,7 +24,7 @@ class HexViewer:
             # Colorazione dei valori esadecimali significativi
             hex_chunk_str_colored = self.color_hex_chunk(hex_chunk_str)
 
-            hex_str += f"{offset}: {hex_chunk_str_colored:<48} | {ascii_chunk}\\\n"
+            hex_str += f"{offset}: {hex_chunk_str_colored:<48} | {ascii_chunk}\\\\n"
         return hex_str
 
     def color_hex_chunk(self, chunk):
@@ -62,17 +62,20 @@ class HexViewer:
         with open(self.filepath, "rb") as f:
             byte_data = f.read()
             ascii_strings = re.findall(r'[ -~]{4,}', byte_data.decode('ascii', errors='ignore'))
-            return "\\\n".join(ascii_strings)
+            return "\\\\n".join(ascii_strings)
 
     def find_headers(self):
         # Placeholder per l'analisi degli header (per esempio per eseguibili)
         return "Header trovati: N/A"
 
     def search_pattern(self, pattern):
+        if pattern is None:
+            return "Pattern non valido: il pattern non può essere None"
+        pattern_bytes = bytes.fromhex(pattern)
         with open(self.filepath, "rb") as f:
             byte_data = f.read()
-            matches = [match.start() for match in re.finditer(pattern.encode(), byte_data)]
-            return f"Pattern trovato a: {', '.join(map(str, matches))}"
+            positions = [i for i in range(len(byte_data)) if byte_data[i:i+len(pattern_bytes)] == pattern_bytes]
+            return f"Pattern trovato a: {', '.join(map(str, positions))}"
 
     def check_integrity(self):
         # Placeholder per la verifica dell'integrità del file
