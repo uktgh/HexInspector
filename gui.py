@@ -9,13 +9,13 @@ class HexInspectorGUI:
     def __init__(self, master):
         self.master = master
         self.master.geometry("900x650")
-        self.master.configure(bg="#2E2E2E")  # Dark Mode Background
+        self.master.configure(bg="#1C1C1C")  # Updated Dark Mode Background
 
         # Menu
-        self.menubar = tk.Menu(self.master, bg="#1E1E1E", fg="white")
+        self.menubar = tk.Menu(self.master, bg="#2B2B2B", fg="white")
         
         # File Menu
-        self.file_menu = tk.Menu(self.menubar, tearoff=0, bg="#333333", fg="white")
+        self.file_menu = tk.Menu(self.menubar, tearoff=0, bg="#3C3C3C", fg="white")
         self.file_menu.add_command(label="Apri", command=self.open_file)
         self.file_menu.add_command(label="Salva", command=self.save_file)
         self.file_menu.add_separator()
@@ -23,7 +23,7 @@ class HexInspectorGUI:
         self.menubar.add_cascade(label="File", menu=self.file_menu)
         
         # View Menu
-        self.view_menu = tk.Menu(self.menubar, tearoff=0, bg="#333333", fg="white")
+        self.view_menu = tk.Menu(self.menubar, tearoff=0, bg="#3C3C3C", fg="white")
         self.view_menu.add_command(label="Visualizza Metadati", command=self.show_metadata)
         self.view_menu.add_command(label="Calcola Checksum", command=self.calculate_checksum)
         self.view_menu.add_separator()
@@ -33,7 +33,7 @@ class HexInspectorGUI:
         self.menubar.add_cascade(label="Visualizza", menu=self.view_menu)
         
         # Analyze Menu
-        self.analyze_menu = tk.Menu(self.menubar, tearoff=0, bg="#333333", fg="white")
+        self.analyze_menu = tk.Menu(self.menubar, tearoff=0, bg="#3C3C3C", fg="white")
         self.analyze_menu.add_command(label="Trova Stringhe ASCII", command=self.find_ascii_strings)
         self.analyze_menu.add_command(label="Trova Header", command=self.find_headers)
         self.analyze_menu.add_separator()
@@ -45,8 +45,12 @@ class HexInspectorGUI:
         self.master.config(menu=self.menubar)
 
         # Text Area for Hex Display
-        self.text_area = tk.Text(self.master, wrap="none", height=30, width=120, bg="#1E1E1E", fg="white", font=("Courier", 10))
-        self.text_area.pack(pady=20)
+        self.text_area = tk.Text(self.master, wrap="none", height=30, width=120, bg="#262626", fg="white", font=("Consolas", 11))
+        self.text_area.pack(pady=20, padx=20)
+
+        # Status Bar
+        self.status_bar = tk.Label(self.master, text="Ready", bd=1, relief=tk.SUNKEN, anchor=tk.W, bg="#1C1C1C", fg="white")
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
         # File Path
         self.filepath = None
@@ -56,6 +60,7 @@ class HexInspectorGUI:
         filepath = filedialog.askopenfilename(filetypes=[("All Files", "*.*")])
         if filepath:
             self.filepath = filepath
+            self.status_bar.config(text=f"Opened: {filepath}")
             self.text_area.delete(1.0, tk.END)
             self.hex_viewer = HexViewer(filepath)
             self.view_hex()
@@ -63,8 +68,12 @@ class HexInspectorGUI:
     def save_file(self):
         filepath = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
         if filepath:
-            with open(filepath, "w") as f:
-                f.write(self.text_area.get(1.0, tk.END))
+            try:
+                with open(filepath, "w") as f:
+                    f.write(self.text_area.get(1.0, tk.END))
+                self.status_bar.config(text=f"File saved: {filepath}")
+            except Exception as e:
+                self.status_bar.config(text=f"Error saving file: {str(e)}")
 
     def view_hex(self):
         if self.hex_viewer:
@@ -84,7 +93,7 @@ class HexInspectorGUI:
         if self.filepath:
             metadata = get_file_metadata(self.filepath)
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Metadata:\n{metadata}")
+            self.text_area.insert(tk.END, f"Metadata:\\n{metadata}")
 
     def calculate_checksum(self):
         if self.filepath:
@@ -121,29 +130,29 @@ class HexInspectorGUI:
         if self.hex_viewer:
             ascii_strings = self.hex_viewer.find_ascii_strings()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Stringhe ASCII trovate:\n{ascii_strings}")
+            self.text_area.insert(tk.END, f"Stringhe ASCII trovate:\\n{ascii_strings}")
 
     def find_headers(self):
         if self.hex_viewer:
             headers = self.hex_viewer.find_headers()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Header trovati:\n{headers}")
+            self.text_area.insert(tk.END, f"Header trovati:\\n{headers}")
 
     def search_hex_pattern(self):
         pattern = simpledialog.askstring("Pattern", "Inserisci il pattern esadecimale da cercare (es. 68 65 6C 6C 6F):")
         if self.hex_viewer:
             results = self.hex_viewer.search_pattern(pattern)
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Pattern trovato:\n{results}")
+            self.text_area.insert(tk.END, f"Pattern trovato:\\n{results}")
 
     def check_integrity(self):
         if self.hex_viewer:
             integrity = self.hex_viewer.check_integrity()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Integrità del file:\n{integrity}")
+            self.text_area.insert(tk.END, f"Integrità del file:\\n{integrity}")
 
     def analyze_compression(self):
         if self.hex_viewer:
             compression_info = self.hex_viewer.analyze_compression()
             self.text_area.delete(1.0, tk.END)
-            self.text_area.insert(tk.END, f"Analisi della compressione:\n{compression_info}")
+            self.text_area.insert(tk.END, f"Analisi della compressione:\\n{compression_info}")

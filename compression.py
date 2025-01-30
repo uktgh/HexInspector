@@ -13,9 +13,12 @@ class CompressionHandler:
 
     def extract_zip(self, filepath):
         with zipfile.ZipFile(filepath, 'r') as zip_ref:
-            file_content = zip_ref.read(zip_ref.namelist()[0])  # Estrai il primo file
-        return file_content
+            with zip_ref.open(zip_ref.namelist()[0]) as file:
+                return file.read()
 
     def extract_gz(self, filepath):
         with gzip.open(filepath, 'rb') as f:
-            return f.read()
+            buffer = io.BytesIO()
+            while chunk := f.read(1024):
+                buffer.write(chunk)
+            return buffer.getvalue()

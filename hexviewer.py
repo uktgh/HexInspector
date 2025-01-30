@@ -24,12 +24,24 @@ class HexViewer:
             # Colorazione dei valori esadecimali significativi
             hex_chunk_str_colored = self.color_hex_chunk(hex_chunk_str)
 
-            hex_str += f"{offset}: {hex_chunk_str_colored:<48} | {ascii_chunk}\n"
+            hex_str += f"{offset}: {hex_chunk_str_colored:<48} | {ascii_chunk}\\n"
         return hex_str
 
     def color_hex_chunk(self, chunk):
-        # Colorazione per ASCII stringhe
-        return re.sub(r"([a-f0-9]{2})", lambda x: f"\033[92m{x.group(1)}\033[0m", chunk)
+        # Colorazione per diversi tipi di caratteri
+        def colorize(match):
+            byte_value = int(match.group(1), 16)
+            if 32 <= byte_value <= 126:
+                # ASCII printable characters
+                return f"\033[92m{match.group(1)}\033[0m"
+            elif byte_value < 32 or byte_value == 127:
+                # Control characters
+                return f"\033[91m{match.group(1)}\033[0m"
+            else:
+                # Non-printable characters
+                return f"\033[93m{match.group(1)}\033[0m"
+        
+        return re.sub(r"([a-f0-9]{2})", colorize, chunk)
 
     def calculate_checksum(self, checksum_type):
         hash_func = None
@@ -50,7 +62,7 @@ class HexViewer:
         with open(self.filepath, "rb") as f:
             byte_data = f.read()
             ascii_strings = re.findall(r'[ -~]{4,}', byte_data.decode('ascii', errors='ignore'))
-            return "\n".join(ascii_strings)
+            return "\\n".join(ascii_strings)
 
     def find_headers(self):
         # Placeholder per l'analisi degli header (per esempio per eseguibili)
