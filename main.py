@@ -5,8 +5,9 @@ def main():
     root = tk.Tk()
     root.title("Hex Inspector")
     # root.iconbitmap("assets/icon.ico")
-    app = HexInspectorGUI(root)
+    root.after(0, HexInspectorGUI, root)  # Lazy initialization of the GUI
     root.mainloop()
+    root.destroy()  # Ensure resources are released properly
 
 if __name__ == "__main__":
     main()

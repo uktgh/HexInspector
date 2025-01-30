@@ -4,21 +4,25 @@ import io
 
 class CompressionHandler:
     def extract(self, filepath):
-        if filepath.endswith('.zip'):
-            return self.extract_zip(filepath)
-        elif filepath.endswith('.gz'):
-            return self.extract_gz(filepath)
-        else:
-            raise ValueError("Tipo di file non supportato per la compressione")
+        extract_methods = {
+            '.zip': self.extract_zip,
+            '.gz': self.extract_gz
+        }
+        for ext, method in extract_methods.items():
+            if filepath.endswith(ext):
+                return method(filepath)
+        raise ValueError(f"Unsupported file type for compression: {filepath}")
 
     def extract_zip(self, filepath):
-        with zipfile.ZipFile(filepath, 'r') as zip_ref:
-            with zip_ref.open(zip_ref.namelist()[0]) as file:
-                return file.read()
+        try:
+            with zipfile.ZipFile(filepath, 'r') as zip_ref:
+                return zip_ref.read(zip_ref.namelist()[0])  # Extract the first file
+        except (zipfile.BadZipFile, IndexError) as e:
+            raise RuntimeError(f"Failed to extract ZIP file: {e}")
 
     def extract_gz(self, filepath):
-        with gzip.open(filepath, 'rb') as f:
-            buffer = io.BytesIO()
-            while chunk := f.read(1024):
-                buffer.write(chunk)
-            return buffer.getvalue()
+        try:
+            with gzip.open(filepath, 'rb') as f:
+                return f.read()
+        except OSError as e:
+            raise RuntimeError(f"Failed to extract GZ file: {e}")
