@@ -124,7 +124,7 @@ class MainWindow:
         self.structure_panel = InfoPanel(self.notebook)
         self.notebook.add(self.structure_panel, text="Structure")
         
-        self.paned_window.add(self.hex_view, weight=2)
+        self.paned_window.add(self.hex_view, weight=3)
         self.paned_window.add(self.notebook, weight=1)
         
     def create_status_bar(self):
@@ -251,6 +251,7 @@ class MainWindow:
                 data = f.read()
                 self._buffer.set_data(data)  # Use set_data instead of load_data
                 self.hex_view.update_view()
+                self.info_panel.update_info(f"File: {file_path}\nSize: {len(data)} bytes")
                 self.status_var.set(f"Opened {file_path}")
 
     def save_file(self):
