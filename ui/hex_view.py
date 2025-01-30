@@ -38,3 +38,16 @@ class HexView(ttk.Frame):
         self.text.see(f"{line}.0")
         self.text.mark_set("insert", f"{line}.0")
         self.text.focus()
+
+    def search(self, term):
+        self.text.tag_remove('search', '1.0', tk.END)
+        if term:
+            start_pos = '1.0'
+            while True:
+                start_pos = self.text.search(term, start_pos, stopindex=tk.END)
+                if not start_pos:
+                    break
+                end_pos = f"{start_pos}+{len(term)}c"
+                self.text.tag_add('search', start_pos, end_pos)
+                start_pos = end_pos
+            self.text.tag_config('search', background='yellow', foreground='black')

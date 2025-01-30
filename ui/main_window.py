@@ -151,19 +151,21 @@ class MainWindow:
         search_frame = ttk.Frame(dialog)
         search_frame.pack(fill=tk.X, padx=5)
         
-        search_entry = ttk.Entry(search_frame)
-        search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        self.search_entry = ttk.Entry(search_frame)
+        self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
         
         options_frame = ttk.Frame(dialog)
         options_frame.pack(fill=tk.X, pady=5)
         
-        ttk.Checkbutton(options_frame, text="Match case").pack(side=tk.LEFT)
-        ttk.Checkbutton(options_frame, text="Search hex").pack(side=tk.LEFT)
+        self.match_case_var = tk.BooleanVar()
+        self.search_hex_var = tk.BooleanVar()
+        ttk.Checkbutton(options_frame, text="Match case", variable=self.match_case_var).pack(side=tk.LEFT)
+        ttk.Checkbutton(options_frame, text="Search hex", variable=self.search_hex_var).pack(side=tk.LEFT)
         
         button_frame = ttk.Frame(dialog)
         button_frame.pack(fill=tk.X, pady=5)
         
-        ttk.Button(button_frame, text="Find Next", style="Accent.TButton").pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="Find Next", style="Accent.TButton", command=self.perform_search).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Cancel", command=dialog.destroy).pack(side=tk.LEFT)
 
     def show_goto_dialog(self):
@@ -270,8 +272,13 @@ class MainWindow:
 
     def search(self):
         search_term = self.search_var.get()
-        if search_term:
-            messagebox.showinfo("Search", f"Searching for {search_term} not implemented yet.")
+        self.hex_view.search(search_term)
+
+    def perform_search(self):
+        search_term = self.search_entry.get()
+        if not self.match_case_var.get():
+            search_term = search_term.lower()
+        self.hex_view.search(search_term)
 
     def create_bindings(self):
         self.root.bind("<Control-o>", lambda event: self.open_file())
