@@ -18,6 +18,8 @@ class MainWindow:
         self._hex_cache = HexCache()
         self._thread_pool = ThreadPoolExecutor(max_workers=4)
         
+        self.bytes_per_row = tk.IntVar(value=16)
+        
         self.setup_ui()
         self.create_bindings()
         self.load_settings()
@@ -96,7 +98,6 @@ class MainWindow:
         view_frame = ttk.LabelFrame(self.toolbar, text="View Options", padding=5)
         view_frame.pack(side=tk.RIGHT, padx=10)
         
-        self.bytes_per_row = tk.IntVar(value=16)
         ttk.Label(view_frame, text="Bytes per row:").pack(side=tk.LEFT, padx=2)
         ttk.Spinbox(view_frame, from_=8, to=32, width=3, textvariable=self.bytes_per_row, command=self.update_view).pack(side=tk.LEFT, padx=2)
         
@@ -106,7 +107,7 @@ class MainWindow:
         self.paned_window.pack(fill=tk.BOTH, expand=True)
         
         # Vista hex migliorata
-        self.hex_view = HexView(self.paned_window, self._buffer, self._hex_cache)
+        self.hex_view = HexView(self.paned_window, self._buffer, self._hex_cache, self.bytes_per_row)
         self.hex_view.pack(fill=tk.BOTH, expand=True)
         
         # Pannello info con tabs
@@ -252,6 +253,8 @@ class MainWindow:
                 self._buffer.set_data(data)  # Use set_data instead of load_data
                 self.hex_view.update_view()
                 self.info_panel.update_info(f"File: {file_path}\nSize: {len(data)} bytes")
+                self.update_analysis_panel(data)
+                self.update_structure_panel(data)
                 self.status_var.set(f"Opened {file_path}")
 
     def save_file(self):
@@ -331,3 +334,13 @@ class MainWindow:
         if len(data2) > length:
             differences.append(f"File 2 has extra data starting at offset {length:08X}")
         return "\n".join(differences)
+
+    def update_analysis_panel(self, data):
+        # Example analysis: show the number of unique bytes
+        unique_bytes = len(set(data))
+        self.analysis_panel.update_info(f"Unique bytes: {unique_bytes}\n")
+
+    def update_structure_panel(self, data):
+        # Example structure: show the first 16 bytes in hex
+        hex_representation = ' '.join(f"{byte:02X}" for byte in data[:16])
+        self.structure_panel.update_info(f"First 16 bytes: {hex_representation}\n")

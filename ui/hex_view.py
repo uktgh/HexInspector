@@ -4,10 +4,11 @@ from core.buffer import MemoryBuffer
 from core.cache import HexCache
 
 class HexView(ttk.Frame):
-    def __init__(self, parent, buffer: MemoryBuffer, cache: HexCache):
+    def __init__(self, parent, buffer: MemoryBuffer, cache: HexCache, bytes_per_row: tk.IntVar):
         super().__init__(parent)
         self.buffer = buffer
         self.cache = cache
+        self.bytes_per_row = bytes_per_row
         self.setup_ui()
 
     def setup_ui(self):
@@ -26,7 +27,7 @@ class HexView(ttk.Frame):
     def update_view(self):
         self.text.config(state=tk.NORMAL)
         self.text.delete(1.0, tk.END)
-        bytes_per_row = 16
+        bytes_per_row = self.bytes_per_row.get()
         hex_data = self.buffer[:].hex()
         ascii_data = self.buffer[:].tobytes().decode('ascii', errors='replace')
         for i in range(0, len(hex_data), bytes_per_row * 2):
@@ -36,7 +37,7 @@ class HexView(ttk.Frame):
         self.text.config(state=tk.DISABLED)
 
     def goto_offset(self, offset):
-        line = offset // 16 + 1
+        line = offset // self.bytes_per_row.get() + 1
         self.text.see(f"{line}.0")
         self.text.mark_set("insert", f"{line}.0")
         self.text.focus()
@@ -46,9 +47,10 @@ class HexView(ttk.Frame):
         if term:
             start_pos = '1.0'
             while True:
-                start_pos = self.text.search(term, start_pos, stopindex=tk.END)
+                start_pos = self.text.search(term, start_pos, stopindex=tk.END, nocase=1)
                 if not start_pos:
                     break
                 end_pos = f"{start_pos}+{len(term)}c"
                 self.text.tag_add('search', start_pos, end_pos)
+                start_pos = end_pos
             self.text.tag_config('search', background='yellow', foreground='black')
