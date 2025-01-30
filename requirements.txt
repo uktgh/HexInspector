@@ -1,1 +1,2 @@
-tk
+tkinter
+sv-ttk>=2.5

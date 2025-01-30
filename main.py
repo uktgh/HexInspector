@@ -1,11 +1,16 @@
 import tkinter as tk
-from gui import HexInspectorGUI
+from tkinter import ttk
+import sys
+from pathlib import Path
+
+# Aggiungi il path del progetto al PYTHONPATH
+sys.path.append(str(Path(__file__).parent.parent))
+
+from ui.main_window import MainWindow
 
 def main():
     root = tk.Tk()
-    root.title("Hex Inspector")
-    # root.iconbitmap("assets/icon.ico")
-    app = HexInspectorGUI(root)
+    app = MainWindow(root)
     root.mainloop()
 
 if __name__ == "__main__":
