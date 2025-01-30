@@ -23,16 +23,6 @@ class MainWindow:
         self.load_settings()
         
     def setup_ui(self):
-        self.root.tk_setPalette(background='#2e2e2e', foreground='#d3d3d3', activeBackground='#3e3e3e', activeForeground='#d3d3d3')
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure('TLabel', background='#2e2e2e', foreground='#d3d3d3')
-        style.configure('TButton', background='#3e3e3e', foreground='#d3d3d3')
-        style.configure('TFrame', background='#2e2e2e')
-        style.configure('TEntry', fieldbackground='#3e3e3e', foreground='#d3d3d3')
-        style.configure('TNotebook', background='#2e2e2e', foreground='#d3d3d3')
-        style.configure('TNotebook.Tab', background='#3e3e3e', foreground='#d3d3d3')
-        
         # Menu principale
         self.create_menu()
         
@@ -50,11 +40,11 @@ class MainWindow:
         self.create_status_bar()
         
     def create_menu(self):
-        menubar = tk.Menu(self.root, bg='#2e2e2e', fg='#d3d3d3')
+        menubar = tk.Menu(self.root)
         self.root.config(menu=menubar)
         
         # File menu
-        file_menu = tk.Menu(menubar, tearoff=0, bg='#2e2e2e', fg='#d3d3d3')
+        file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Open...", command=self.open_file, accelerator="Ctrl+O")
         file_menu.add_command(label="Save", command=self.save_file, accelerator="Ctrl+S")
@@ -63,13 +53,13 @@ class MainWindow:
         file_menu.add_command(label="Exit", command=self.root.quit)
         
         # Edit menu
-        edit_menu = tk.Menu(menubar, tearoff=0, bg='#2e2e2e', fg='#d3d3d3')
+        edit_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Edit", menu=edit_menu)
         edit_menu.add_command(label="Find...", command=self.show_find_dialog, accelerator="Ctrl+F")
         edit_menu.add_command(label="Go to Offset...", command=self.show_goto_dialog, accelerator="Ctrl+G")
         
         # View menu
-        view_menu = tk.Menu(menubar, tearoff=0, bg='#2e2e2e', fg='#d3d3d3')
+        view_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="View", menu=view_menu)
         self.show_offset_var = tk.BooleanVar(value=True)
         self.show_ascii_var = tk.BooleanVar(value=True)
@@ -77,7 +67,7 @@ class MainWindow:
         view_menu.add_checkbutton(label="Show ASCII", variable=self.show_ascii_var, command=self.update_view)
         
         # Tools menu
-        tools_menu = tk.Menu(menubar, tearoff=0, bg='#2e2e2e', fg='#d3d3d3')
+        tools_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Tools", menu=tools_menu)
         tools_menu.add_command(label="Calculate Hashes...", command=self.show_hashes)
         tools_menu.add_command(label="Analyze Patterns...", command=self.analyze_patterns)
@@ -227,7 +217,7 @@ class MainWindow:
         results_frame = ttk.LabelFrame(dialog, text="Results", padding=5)
         results_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
-        self.results_text = tk.Text(results_frame, height=10, bg="#2e2e2e", fg="#d3d3d3", insertbackground="#d3d3d3")
+        self.results_text = tk.Text(results_frame, height=10)
         self.results_text.pack(fill=tk.BOTH, expand=True)
         
         # Buttons
@@ -315,7 +305,7 @@ class MainWindow:
         file1_path = self.file1_var.get()
         file2_path = self.file2_var.get()
         if file1_path and file2_path:
-            with open(file1_path, 'rb') as f1, open(file2_path, 'rb') as f2:
+            with open(file1_path, 'rb') as f1, open file2_path, 'rb') as f2:
                 data1 = f1.read()
                 data2 = f2.read()
                 differences = self.find_differences(data1, data2)

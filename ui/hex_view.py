@@ -11,7 +11,7 @@ class HexView(ttk.Frame):
         self.setup_ui()
 
     def setup_ui(self):
-        self.text = tk.Text(self, font=("Courier", 12), wrap=tk.NONE, bg="#2e2e2e", fg="#d3d3d3", insertbackground="#d3d3d3")
+        self.text = tk.Text(self, font=("Courier", 12), wrap=tk.NONE)
         self.vsb = ttk.Scrollbar(self, orient=tk.VERTICAL, command=self.text.yview)
         self.hsb = ttk.Scrollbar(self, orient=tk.HORIZONTAL, command=self.text.xview)
         self.text.configure(yscrollcommand=self.vsb.set, xscrollcommand=self.hsb.set)
