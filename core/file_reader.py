@@ -1,6 +1,7 @@
 import mmap
-from typing import Generator
 import os
+
+from typing import Generator
 
 class AsyncFileReader:
     def __init__(self, filename: str, chunk_size: int = 1024 * 1024):

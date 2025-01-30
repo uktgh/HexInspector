@@ -1,12 +1,11 @@
 import tkinter as tk
-from tkinter import ttk
 import sys
+
 from pathlib import Path
-
-# Aggiungi il path del progetto al PYTHONPATH
-sys.path.append(str(Path(__file__).parent.parent))
-
+from tkinter import ttk
 from ui.main_window import MainWindow
+
+sys.path.append(str(Path(__file__).parent.parent))
 
 def main():
     root = tk.Tk()

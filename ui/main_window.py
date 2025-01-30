@@ -1,17 +1,19 @@
 import tkinter as tk
+import json
+import os
+import hashlib
+
 from tkinter import ttk, filedialog, messagebox
 from core.buffer import MemoryBuffer
 from core.cache import HexCache
 from ui.hex_view import HexView
 from ui.info_panel import InfoPanel
 from concurrent.futures import ThreadPoolExecutor
-import json
-import os
 
 class MainWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("HexInspector Pro")
+        self.root.title("HexInspector")
         self.root.geometry("1400x900")
         
         self._buffer = MemoryBuffer()
@@ -19,33 +21,27 @@ class MainWindow:
         self._thread_pool = ThreadPoolExecutor(max_workers=4)
         
         self.bytes_per_row = tk.IntVar(value=16)
+        self.show_offset_var = tk.BooleanVar(value=True)
+        self.show_ascii_var = tk.BooleanVar(value=True)
         
         self.setup_ui()
         self.create_bindings()
         self.load_settings()
         
     def setup_ui(self):
-        # Menu principale
         self.create_menu()
         
-        # Main container con padding
         self.main_container = ttk.Frame(self.root, padding="10")
         self.main_container.pack(fill=tk.BOTH, expand=True)
         
-        # Toolbar con stile moderno
         self.create_toolbar()
-        
-        # Pannello principale con vista hex e info
         self.create_main_panel()
-        
-        # Status bar moderna
         self.create_status_bar()
         
     def create_menu(self):
         menubar = tk.Menu(self.root)
         self.root.config(menu=menubar)
         
-        # File menu
         file_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Open...", command=self.open_file, accelerator="Ctrl+O")
@@ -54,24 +50,19 @@ class MainWindow:
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit)
         
-        # Edit menu
         edit_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Edit", menu=edit_menu)
         edit_menu.add_command(label="Find...", command=self.show_find_dialog, accelerator="Ctrl+F")
         edit_menu.add_command(label="Go to Offset...", command=self.show_goto_dialog, accelerator="Ctrl+G")
         
-        # View menu
         view_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="View", menu=view_menu)
-        self.show_offset_var = tk.BooleanVar(value=True)
-        self.show_ascii_var = tk.BooleanVar(value=True)
         view_menu.add_checkbutton(label="Show Offset", variable=self.show_offset_var, command=self.update_view)
         view_menu.add_checkbutton(label="Show ASCII", variable=self.show_ascii_var, command=self.update_view)
         
-        # Tools menu
         tools_menu = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Tools", menu=tools_menu)
-        tools_menu.add_command(label="Calculate Hashes...", command=self.show_hashes)
+        tools_menu.add_command(label="Calculate Hashes...", command=self.calculate_hashes)
         tools_menu.add_command(label="Analyze Patterns...", command=self.analyze_patterns)
         tools_menu.add_command(label="Compare Files...", command=self.compare_files)
         
@@ -79,14 +70,11 @@ class MainWindow:
         self.toolbar = ttk.Frame(self.main_container)
         self.toolbar.pack(fill=tk.X, pady=(0, 10))
         
-        # Bottoni moderni con icone
         ttk.Button(self.toolbar, text="Open", style="Accent.TButton", command=self.open_file).pack(side=tk.LEFT, padx=2)
         ttk.Button(self.toolbar, text="Save", command=self.save_file).pack(side=tk.LEFT, padx=2)
         
-        # Separatore
         ttk.Separator(self.toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=5, fill=tk.Y)
         
-        # Search frame con stile moderno
         search_frame = ttk.LabelFrame(self.toolbar, text="Search", padding=5)
         search_frame.pack(side=tk.LEFT, padx=10)
         
@@ -94,7 +82,6 @@ class MainWindow:
         ttk.Entry(search_frame, textvariable=self.search_var, width=30).pack(side=tk.LEFT, padx=2)
         ttk.Button(search_frame, text="Find", style="Accent.TButton", command=self.search).pack(side=tk.LEFT, padx=2)
         
-        # View options
         view_frame = ttk.LabelFrame(self.toolbar, text="View Options", padding=5)
         view_frame.pack(side=tk.RIGHT, padx=10)
         
@@ -102,26 +89,20 @@ class MainWindow:
         ttk.Spinbox(view_frame, from_=8, to=32, width=3, textvariable=self.bytes_per_row, command=self.update_view).pack(side=tk.LEFT, padx=2)
         
     def create_main_panel(self):
-        # Pannello principale con divisore
         self.paned_window = ttk.PanedWindow(self.main_container, orient=tk.HORIZONTAL)
         self.paned_window.pack(fill=tk.BOTH, expand=True)
         
-        # Vista hex migliorata
-        self.hex_view = HexView(self.paned_window, self._buffer, self._hex_cache, self.bytes_per_row)
+        self.hex_view = HexView(self.paned_window, self._buffer, self._hex_cache, self.bytes_per_row, self.show_offset_var, self.show_ascii_var)
         self.hex_view.pack(fill=tk.BOTH, expand=True)
         
-        # Pannello info con tabs
         self.notebook = ttk.Notebook(self.paned_window)
         
-        # Tab Information
         self.info_panel = InfoPanel(self.notebook)
         self.notebook.add(self.info_panel, text="Information")
         
-        # Tab Analysis
         self.analysis_panel = InfoPanel(self.notebook)
         self.notebook.add(self.analysis_panel, text="Analysis")
         
-        # Tab Structure
         self.structure_panel = InfoPanel(self.notebook)
         self.notebook.add(self.structure_panel, text="Structure")
         
@@ -132,7 +113,6 @@ class MainWindow:
         self.status_frame = ttk.Frame(self.root)
         self.status_frame.pack(fill=tk.X, side=tk.BOTTOM)
         
-        # Status con più informazioni
         self.status_var = tk.StringVar()
         self.position_var = tk.StringVar()
         self.size_var = tk.StringVar()
@@ -193,7 +173,6 @@ class MainWindow:
         dialog.geometry("600x400")
         dialog.transient(self.root)
         
-        # File selection
         file_frame = ttk.LabelFrame(dialog, text="Files to Compare", padding=5)
         file_frame.pack(fill=tk.X, padx=5, pady=5)
         
@@ -207,7 +186,6 @@ class MainWindow:
         ttk.Entry(file_frame, textvariable=self.file2_var).grid(row=1, column=1, sticky=tk.EW)
         ttk.Button(file_frame, text="Browse...", command=self.browse_file2).grid(row=1, column=2)
         
-        # Comparison options
         options_frame = ttk.LabelFrame(dialog, text="Options", padding=5)
         options_frame.pack(fill=tk.X, padx=5, pady=5)
         
@@ -216,14 +194,12 @@ class MainWindow:
         ttk.Checkbutton(options_frame, text="Ignore case", variable=self.ignore_case_var).pack(anchor=tk.W)
         ttk.Checkbutton(options_frame, text="Show only differences", variable=self.show_differences_var).pack(anchor=tk.W)
         
-        # Results area
         results_frame = ttk.LabelFrame(dialog, text="Results", padding=5)
         results_frame.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
         
         self.results_text = tk.Text(results_frame, height=10)
         self.results_text.pack(fill=tk.BOTH, expand=True)
         
-        # Buttons
         button_frame = ttk.Frame(dialog)
         button_frame.pack(fill=tk.X, pady=5)
         
@@ -250,7 +226,7 @@ class MainWindow:
         if file_path:
             with open(file_path, 'rb') as f:
                 data = f.read()
-                self._buffer.set_data(data)  # Use set_data instead of load_data
+                self._buffer.set_data(data)
                 self.hex_view.update_view()
                 self.info_panel.update_info(f"File: {file_path}\nSize: {len(data)} bytes")
                 self.update_analysis_panel(data)
@@ -269,10 +245,53 @@ class MainWindow:
         self.save_file()
 
     def show_hashes(self):
-        messagebox.showinfo("Hashes", "Hash calculation not implemented yet.")
+        data = self._buffer[:]
+        md5 = hashlib.md5(data).hexdigest()
+        sha1 = hashlib.sha1(data).hexdigest()
+        sha256 = hashlib.sha256(data).hexdigest()
+        hashes_info = f"MD5: {md5}\nSHA-1: {sha1}\nSHA-256: {sha256}"
+        messagebox.showinfo("Hashes", hashes_info)
+
+    def calculate_hashes(self):
+        data = self._buffer[:]
+        md5 = hashlib.md5(data).hexdigest()
+        sha1 = hashlib.sha1(data).hexdigest()
+        sha256 = hashlib.sha256(data).hexdigest()
+        hashes_info = f"MD5: {md5}\nSHA-1: {sha1}\nSHA-256: {sha256}"
+        messagebox.showinfo("Hashes", hashes_info)
 
     def analyze_patterns(self):
-        messagebox.showinfo("Analyze Patterns", "Pattern analysis not implemented yet.")
+        data = self._buffer[:]
+        pattern_info = self.find_patterns(data)
+        self.show_patterns_dialog(pattern_info)
+
+    def show_patterns_dialog(self, pattern_info):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Pattern Analysis")
+        dialog.geometry("600x400")
+        dialog.transient(self.root)
+        
+        text = tk.Text(dialog, wrap=tk.WORD)
+        text.pack(fill=tk.BOTH, expand=True)
+        text.insert(tk.END, pattern_info)
+        text.config(state=tk.DISABLED)
+        
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Button(button_frame, text="Close", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
+
+    def find_patterns(self, data):
+        patterns = {}
+        for i in range(len(data) - 1):
+            pair = bytes(data[i:i+2])
+            if pair in patterns:
+                patterns[pair] += 1
+            else:
+                patterns[pair] = 1
+        sorted_patterns = sorted(patterns.items(), key=lambda item: item[1], reverse=True)
+        pattern_info = "\n".join(f"{pair.hex()}: {count}" for pair, count in sorted_patterns if count > 1)
+        return pattern_info
 
     def search(self):
         search_term = self.search_var.get()
@@ -336,11 +355,9 @@ class MainWindow:
         return "\n".join(differences)
 
     def update_analysis_panel(self, data):
-        # Example analysis: show the number of unique bytes
         unique_bytes = len(set(data))
         self.analysis_panel.update_info(f"Unique bytes: {unique_bytes}\n")
 
     def update_structure_panel(self, data):
-        # Example structure: show the first 16 bytes in hex
         hex_representation = ' '.join(f"{byte:02X}" for byte in data[:16])
         self.structure_panel.update_info(f"First 16 bytes: {hex_representation}\n")
